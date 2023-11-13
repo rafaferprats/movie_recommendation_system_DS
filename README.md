@@ -7,11 +7,11 @@ Collaborative filtering is based on the assumption that people who agreed in the
 About DataSet
 ------------
 
-•	Tags.csv 
+•	Tags.csv ->
 userId,movieId,tag,timestamp
 
-•	movie.csv
+•	movie.csv ->
 movieId,title,genres
 
-•	ratings.csv
+•	ratings.csv ->
 userId, movieId, rating, timestamp
