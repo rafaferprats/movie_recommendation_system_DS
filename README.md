@@ -23,8 +23,8 @@ It is highly recommended setting up a virtual env following these steps:
 
 1- Clone the repo
 
-2- Inside of Anaconda terminal run the file create_venv_local.bat
+2- Inside of Anaconda terminal navigate to the folder bin/local/ and  run the file create_venv_local.bat
 
-3- This file will ask you the path of the venv (use the path of the folder of the proyect, this my path as example C:\Users\rafae\Desktop\MLOps\PF)
+3- This file will ask you the path of the venv (use the path of the folder of the proyect, this is my path as example C:\Users\rafae\Desktop\MLOps\PF) and create the venv following the python version defined at the environment.yml with the proper requirements.txt
 
 4- Activate your venv and you can start to work
