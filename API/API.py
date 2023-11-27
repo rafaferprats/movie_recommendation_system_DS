@@ -19,9 +19,7 @@ refined_dataset = pd.read_csv("../data/refined_dataset.csv")
 def read_item(input_user: int):
     input_user = int(input_user)
     cluster_users = refined_dataset.loc[refined_dataset['userId'] == input_user, 'loc_clusters_users']
-    print(cluster_users.value_counts())
     cluster_users = Counter(cluster_users).most_common(1)[0]  # 4, 6 times
-    print(cluster_users)
     cluster_users[0]
 
     users = refined_dataset.loc[refined_dataset['loc_clusters_users'] == cluster_users[0], 'userId']
