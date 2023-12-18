@@ -76,14 +76,15 @@ start the API via Anaconda prompt
 
 API v2 call example (main.py)
 -------------------
+to check it ```http://127.0.0.1:5500/```
+
 via userId:
-userID=3467
+userID=100
 
 ```http://127.0.0.1:5500/movie_recommendation_via_user/{userId}?input_user=100```
 
 via movieId:
-movieId = 994
-
+movieId = 3467
 
 ```http://127.0.0.1:5500/movie_recomendation_via_movie/{movieId}?input_movie=3467```
 
