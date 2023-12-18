@@ -67,3 +67,23 @@ movieId = 994
   -H 'accept: application/json'
 ```
 ```http://127.0.0.1:8000/movie_recomendation_via_movie/{movieId}?input_movie=994```
+
+
+API v2 Set-up (main.py)
+-------------------
+start the API via Anaconda prompt
+```python main.py```
+
+API v2 call example (main.py)
+-------------------
+via userId:
+userID=3467
+
+```http://127.0.0.1:5500/movie_recommendation_via_user/{userId}?input_user=100```
+
+via movieId:
+movieId = 994
+
+
+```http://127.0.0.1:5500/movie_recomendation_via_movie/{movieId}?input_movie=3467```
+
