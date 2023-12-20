@@ -73,18 +73,30 @@ API v2 Set-up (main.py)
 -------------------
 start the API via Anaconda prompt
 ```python main.py```
+do not forget to comment the line 29 and uncomment the line 32 of the main.py
 
 API v2 call example (main.py)
 -------------------
-to check it ```http://127.0.0.1:5500/```
+to check it ```http://127.0.0.1:5000/```
 
 via userId:
 userID=100
 
-```http://127.0.0.1:5500/movie_recommendation_via_user/{userId}?input_user=100```
+```http://127.0.0.1:5000/movie_recommendation_via_user/{userId}?input_user=100```
 
 via movieId:
 movieId = 3467
 
-```http://127.0.0.1:5500/movie_recomendation_via_movie/{movieId}?input_movie=3467```
+```http://127.0.0.1:5000/movie_recomendation_via_movie/{movieId}?input_movie=3467```
+
+Run the app in Docker Containers
+--------------------
+do not forget to uncomment the line 29 and comment the line 32 of the main.py
+Built the image with the following command:
+```docker build -t movie-reco-api .```
+Run the docker image using the following command, 
+```docker run -d -p 5000:5000 movie-reco-api```
+
+<img width="860" alt="movie_reco_api" src="https://github.com/rafaferprats/movie_recommendation_system_DS/assets/148894405/4dd14a67-f2ec-45b5-bede-e7837d66a5ac">
+
 
