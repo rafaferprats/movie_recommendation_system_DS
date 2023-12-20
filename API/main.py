@@ -23,8 +23,15 @@ app = FastAPI(
         }
     ]
     )
+    
+    
+#if you want to run the app with docker use this line
+refined_dataset = pd.read_csv("final_db.csv")
 
-refined_dataset = pd.read_csv("../data/final_db.csv")
+#if you want to run the app to test the api use this line
+#refined_dataset = pd.read_csv("../data/final_db.csv")
+
+
 # user input via API
 # df = pd.DataFrame(np.array([[userId, rating]]),
 #                   columns=['userId', 'rating'])
@@ -114,4 +121,5 @@ def read_item(input_movie: int):
     
 if __name__ == "__main__":
     # Run the FastAPI application on an Uvicorn server
-    uvicorn.run("main:app", port=5500, reload=False)  # nosec
+    uvicorn.run(host="0.0.0.0", port=5000)
+    
