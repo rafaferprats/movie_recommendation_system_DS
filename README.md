@@ -92,6 +92,7 @@ movieId = 3467
 Run the app in Docker Containers
 --------------------
 do not forget to uncomment the line 29 and comment the line 32 of the main.py
+
 Built the image with the following command:
 ```docker build -t movie-reco-api .```
 Run the docker image using the following command, 
