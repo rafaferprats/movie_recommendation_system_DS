@@ -95,11 +95,11 @@ do not forget to uncomment the line 29 and comment the line 32 of the main.py
 
 Built the image with the following command:
 
-```docker build -t movie-reco-api .```
+```docker build -t movie_reco_api .```
 
 Run the docker image using the following command, 
 
-```docker run -d -p 5000:5000 movie-reco-api```
+```docker run -d -p 5000:5000 movie_reco_api```
 
 <img width="860" alt="movie_reco_api" src="https://github.com/rafaferprats/movie_recommendation_system_DS/assets/148894405/4dd14a67-f2ec-45b5-bede-e7837d66a5ac">
 
