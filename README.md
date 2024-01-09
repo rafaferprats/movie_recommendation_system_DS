@@ -52,42 +52,51 @@ do not forget to comment the line 29 and uncomment the line 32 of the main.py
 
 API call example (main.py)
 -------------------
-to check it ```http://localhost:5000/```
+•	to check it 
 
-via userId:
+```http://localhost:5000/```
+
+•	recommendation via userId:
+
 userID=100
 
 ```http://localhost:5000/movie_recommendation_via_user/100```
 
-via movieId:
+•	recommendation via movieId:
+
 movieId = 500
 
 ```http://localhost:5000/movie_recomendation_via_movie/500```
 
-Show DB
+•	Show DB
 
 ```http://localhost:5000/show_db_data/```
 
-Check if a movie is in DB
+•	Check if a movie is in DB
+
 movieId=500
 
 ```http://localhost:5000/check_movie_exist/500```
 
-Check if a user is in DB
+•	Check if a user is in DB
+
 userId=100
 
 ```http://localhost:5000/check_user_exist/100```
 
-Add movie with a rating from specific user
-userId=10
-movieId=500
+•	Add movie with a rating from specific user
+
+userId=10, 
+movieId=500, 
 rating=1
 
 ```http://localhost:5000/userid/10/movieid/500/rating/1```
 
-Add movie with a rating from a new user
-movieId=200
+•	Add movie with a rating from a new user
+
+movieId=200, 
 rating=4.5
+
 ```http://localhost:5000/add_user/movieid/200/rating/4.5```
 
 
