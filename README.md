@@ -42,52 +42,63 @@ It is highly recommended setting up a virtual env following these steps:
 4- Activate your venv and you can start to work
 
 
-API Set-up
--------------------
-start the API via the command
-```uvicorn main:app --reload```
-
-API call example
--------------------
-via userId:
-userID=1
-
-```curl -X 'GET' \
-  'http://127.0.0.1:8000/movie_recommendation_via_user/{userId}?input_user=1' \
-  -H 'accept: application/json'
-  ```
-
-```http://127.0.0.1:8000/movie_recommendation_via_user/{userId}?input_user=1```
-
-via movieId:
-movieId = 994
-
-```curl -X 'GET' \
-  'http://127.0.0.1:8000/movie_recomendation_via_movie/{movieId}?input_movie=994' \
-  -H 'accept: application/json'
-```
-```http://127.0.0.1:8000/movie_recomendation_via_movie/{movieId}?input_movie=994```
 
 
-API v2 Set-up (main.py)
+API Set-up (main.py)
 -------------------
 start the API via Anaconda prompt
 ```python main.py```
 do not forget to comment the line 29 and uncomment the line 32 of the main.py
 
-API v2 call example (main.py)
+API call example (main.py)
 -------------------
-to check it ```http://127.0.0.1:5000/```
+•	to check it 
 
-via userId:
+```http://localhost:5000/```
+
+•	recommendation via userId:
+
 userID=100
 
-```http://127.0.0.1:5000/movie_recommendation_via_user/{userId}?input_user=100```
+```http://localhost:5000/movie_recommendation_via_user/100```
 
-via movieId:
-movieId = 3467
+•	recommendation via movieId:
 
-```http://127.0.0.1:5000/movie_recomendation_via_movie/{movieId}?input_movie=3467```
+movieId = 500
+
+```http://localhost:5000/movie_recomendation_via_movie/500```
+
+•	Show DB
+
+```http://localhost:5000/show_db_data/```
+
+•	Check if a movie is in DB
+
+movieId=500
+
+```http://localhost:5000/check_movie_exist/500```
+
+•	Check if a user is in DB
+
+userId=100
+
+```http://localhost:5000/check_user_exist/100```
+
+•	Add movie with a rating from specific user
+
+userId=10, 
+movieId=500, 
+rating=1
+
+```http://localhost:5000/userid/10/movieid/500/rating/1```
+
+•	Add movie with a rating from a new user
+
+movieId=200, 
+rating=4.5
+
+```http://localhost:5000/add_user/movieid/200/rating/4.5```
+
 
 Run the app in Docker Containers
 --------------------
