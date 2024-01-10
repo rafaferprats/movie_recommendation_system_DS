@@ -3,6 +3,7 @@ import pickle
 from fastapi import FastAPI
 from collections import Counter
 import uvicorn
+import os
 
 app = FastAPI(
     title="Movie Recommender API",
@@ -31,7 +32,7 @@ app = FastAPI(
 #if you want to run the app to test the api use this line
 final_db = pd.read_csv("../data/final_db.csv")
 
-
+retrain_path = 'retrain_models.py'
 # user input via API
 # df = pd.DataFrame(np.array([[userId, rating]]),
 #                   columns=['userId', 'rating'])
@@ -166,11 +167,15 @@ def add_user(movieId_new_row: int, rating_score_new_row: float):
         #print(final_db.info())
         title_str = title_new_rating.iloc[0]
         
-        new_row = {'userId': new_user_id, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': new_user_id, 'loc_clusters_movies': new_user_id}
-        
+        new_row = {'userId': new_user_id, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': movieId_new_row, 'loc_clusters_movies': movieId_new_row}
+        #print(new_row)
         final_db = final_db.append(new_row, ignore_index=True)
-        final_db.to_pickle("../data/final_dbt.pkl")
-        final_db.to_csv('../data/final_dbt.csv', sep=',', encoding='utf-8', index=False)
+        final_df = final_db[['userId', 'title', 'movieId', 'rating']].copy()
+        print('Retraining the model with the new user . ')
+        print('Retraining the model with the new user ..')
+        print('Retraining the model with the new user ... waiting retrain time')
+        final_df.to_csv('../data/refined_dataset.csv', sep=',', encoding='utf-8')
+        os.system(f'python {retrain_path}')
         return {'new userId as': int(new_user_id),
                 'movieId': int(movieId_new_row),
                 'movie title': str(title_str),
@@ -199,8 +204,12 @@ def user_add_rating(userId_new_row:int, movieId_new_row: int, rating_score_new_r
         new_row = {'userId': user_new_rating, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': user_new_rating, 'loc_clusters_movies': user_new_rating}
         #print(new_row)
         final_db = final_db.append(new_row, ignore_index=True)
-        final_db.to_pickle("../data/final_dbt.pkl")
-        final_db.to_csv('../data/final_dbt.csv', sep=',', encoding='utf-8', index=False)
+        final_df = final_db[['userId', 'title', 'movieId', 'rating']].copy()
+        print('Retraining the model with the new data . ')
+        print('Retraining the model with the new data ..')
+        print('Retraining the model with the new data ... waiting retrain time')
+        final_df.to_csv('../data/refined_dataset.csv', sep=',', encoding='utf-8')
+        os.system(f'python {retrain_path}')
         return {'userId as': int(user_new_rating),
                 'movieId': int(movieId_new_row),
                 'movie title': str(title_str),
@@ -233,6 +242,23 @@ def show_db_data():
             'rating of the movies with 4': int(rating_count_df['count'].iloc[7]),
             'rating of the movies with 4.5': int(rating_count_df['count'].iloc[8]),
             'rating of the movies with 5': int(rating_count_df['count'].iloc[9]),}
+    
+@app.get("/show_scores/")
+def show_scores_data():    
+    """
+    In this endpoint a we can check the numbers of users, movies and ratings
+    :param:
+    :return:
+    """
+    
+    scores_data = pd.read_csv("../data/movie_reco_scores.csv")
+    
+    sco_label = scores_data.columns.tolist()
+    sco_retrain = scores_data.iloc[-1].tolist()
+    
+    
+    return {'Labels: ': sco_label,
+            'Values: ': sco_retrain,}
     
 
 
