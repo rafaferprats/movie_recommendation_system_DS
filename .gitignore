@@ -11,8 +11,10 @@ __pycache__/
 
 *$py.class
 	
-
- 
+# model examples to exclude
+ *similarity_model.py
+ *model_svm_xgboost_training.py
+ *knn_model.py
 	
 
 # IDE
