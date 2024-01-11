@@ -8,8 +8,9 @@ RUN pip3 install --upgrade pip
 # Create app directory
 WORKDIR /app
 
-COPY API/main.py /app/main.py
-COPY data/final_db.csv /app/final_db.csv
+
+COPY main.py /app/main.py
+
 
 
 

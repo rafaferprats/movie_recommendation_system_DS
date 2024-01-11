@@ -30,9 +30,9 @@ app = FastAPI(
 #final_db = pd.read_csv("final_db.csv")
 
 #if you want to run the app to test the api use this line
-final_db = pd.read_csv("../data/final_db.csv")
-
-retrain_path = 'retrain_models.py'
+n_retrain = 0
+final_db = pd.read_csv("data/final_db.csv")
+retrain_path = 'API/retrain_models.py'
 # user input via API
 # df = pd.DataFrame(np.array([[userId, rating]]),
 #                   columns=['userId', 'rating'])
@@ -156,7 +156,7 @@ def add_user(movieId_new_row: int, rating_score_new_row: float):
     :param movieId_new_row, rating_score_new_row:
     :return:
     """
-    global final_db
+    global final_db, n_retrain
     new_user_id =  int(final_db['userId'].max() + 1)
     
     try:
@@ -169,13 +169,23 @@ def add_user(movieId_new_row: int, rating_score_new_row: float):
         
         new_row = {'userId': new_user_id, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': movieId_new_row, 'loc_clusters_movies': movieId_new_row}
         #print(new_row)
-        final_db = final_db.append(new_row, ignore_index=True)
-        final_df = final_db[['userId', 'title', 'movieId', 'rating']].copy()
-        print('Retraining the model with the new user . ')
-        print('Retraining the model with the new user ..')
-        print('Retraining the model with the new user ... waiting retrain time')
-        final_df.to_csv('../data/refined_dataset.csv', sep=',', encoding='utf-8')
-        os.system(f'python {retrain_path}')
+        #final_db = final_db.append(new_row, ignore_index=True)
+        
+        new_row = pd.DataFrame({'userId': new_user_id, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': movieId_new_row, 'loc_clusters_movies': movieId_new_row}, index=[0])
+        final_db = pd.concat([new_row,final_db.loc[:]])
+        if n_retrain == 5:
+            n_retrain = 0
+            final_df = final_db[['userId', 'title', 'movieId', 'rating']].copy()
+            print('Retraining the model with the new user . ')
+            print('Retraining the model with the new user ..')
+            print('Retraining the model with the new user ... waiting retrain time')
+            final_df.to_csv('data/refined_dataset.csv', sep=',', encoding='utf-8')
+            os.system(f'python {retrain_path}')
+        else:
+            print('next retrain when you add ', 5- n_retrain, ' rating more')
+            n_retrain = n_retrain + 1
+            
+        
         return {'new userId as': int(new_user_id),
                 'movieId': int(movieId_new_row),
                 'movie title': str(title_str),
@@ -192,29 +202,30 @@ def user_add_rating(userId_new_row:int, movieId_new_row: int, rating_score_new_r
     :param userId_new_row, movieId_new_row, rating_score_new_row:
     :return:
     """
-    global final_db
+    global final_db, n_retrain
     try:
         user_new_rating = final_db.loc[final_db['userId'] == userId_new_row, 'userId'].iloc[0]
         title_new_rating = final_db.loc[final_db['movieId'] == movieId_new_row, 'title']
-        #print(user_new_rating)
-        #print(movieId_new_row)
         title_str = title_new_rating.iloc[0]
-        #print(title_str)
-        
-        new_row = {'userId': user_new_rating, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': user_new_rating, 'loc_clusters_movies': user_new_rating}
-        #print(new_row)
-        final_db = final_db.append(new_row, ignore_index=True)
-        final_df = final_db[['userId', 'title', 'movieId', 'rating']].copy()
-        print('Retraining the model with the new data . ')
-        print('Retraining the model with the new data ..')
-        print('Retraining the model with the new data ... waiting retrain time')
-        final_df.to_csv('../data/refined_dataset.csv', sep=',', encoding='utf-8')
-        os.system(f'python {retrain_path}')
-        return {'userId as': int(user_new_rating),
-                'movieId': int(movieId_new_row),
-                'movie title': str(title_str),
-                'rating score': float(rating_score_new_row),
-                'the movie has been rated': 'and added to our DB',}
+        new_row = pd.DataFrame({'userId': user_new_rating, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': user_new_rating, 'loc_clusters_movies': user_new_rating}, index=[0])
+        final_db = pd.concat([new_row,final_db.loc[:]])
+        if n_retrain == 5:
+            n_retrain = 0
+            final_df = final_db[['userId', 'title', 'movieId', 'rating']].copy()
+            print('Retraining the model with the new data . ')
+            print('Retraining the model with the new data ..')
+            print('Retraining the model with the new data ... waiting retrain time')
+            final_df.to_csv('data/refined_dataset.csv', sep=',', encoding='utf-8')
+            os.system(f'python {retrain_path}')
+        else:
+            print('next retrain when you add ', 5- n_retrain, ' rating more')
+            n_retrain = n_retrain + 1
+            return {'userId as': int(user_new_rating),
+                    'movieId': int(movieId_new_row),
+                    'movie title': str(title_str),
+                    'rating score': float(rating_score_new_row),
+                    'the movie has been rated': 'and added to our DB',}
+                
     except:
         return {'We dont have that movie added or that user, please check other endpoint to check the userid or movieid'}
 
@@ -225,11 +236,12 @@ def show_db_data():
     :param:
     :return:
     """
+    global final_db
     rating_count_df = pd.DataFrame(final_db.groupby(['rating']).size(), columns=['count'])
-    num_users = len(final_db['userId'].value_counts())
+    num_users = final_db['userId'].max()
     num_items = len(final_db['title'].value_counts())
 
-    return {'The numbers of users in db are: ': num_users,
+    return {'The numbers of users in db are: ': int(num_users),
             'The numbers of movies in db are: ': num_items,
             '-> List rating of the movies from 0.5 to 5':'',
             'rating of the movies with 0.5': int(rating_count_df['count'].iloc[0]),
@@ -251,10 +263,9 @@ def show_scores_data():
     :return:
     """
     
-    scores_data = pd.read_csv("../data/movie_reco_scores.csv")
-    
+    scores_data = pd.read_csv("data/movie_reco_scores.csv")    
     sco_label = scores_data.columns.tolist()
-    sco_retrain = scores_data.iloc[-1].tolist()
+    sco_retrain = scores_data.iloc[0].tolist()
     
     
     return {'Labels: ': sco_label,
