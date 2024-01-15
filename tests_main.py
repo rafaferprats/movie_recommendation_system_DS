@@ -3,7 +3,7 @@ from main import app
 
 client = TestClient(app)
 
-def testing():
+def tests_main():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json() == {"greetings": "welcome"}
