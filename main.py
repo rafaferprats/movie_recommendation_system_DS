@@ -238,8 +238,8 @@ def show_db_data():
     """
     global final_db
     rating_count_df = pd.DataFrame(final_db.groupby(['rating']).size(), columns=['count'])
-    num_users = final_db['userId'].max()
-    num_items = len(final_db['title'].value_counts())
+    num_users = final_db['userId'].nunique()
+    num_items = final_db['title'].nunique()
 
     return {'The numbers of users in db are: ': int(num_users),
             'The numbers of movies in db are: ': num_items,
@@ -270,7 +270,49 @@ def show_scores_data():
     
     return {'Labels: ': sco_label,
             'Values: ': sco_retrain,}
-    
+            
+          
+
+@app.get("/delete_user/{userId_removed}")
+async def delete_user(userId_removed:int):
+    """
+    In this endpoint we can check if a userId exists in the DB to remove it
+    :param userId_check:
+    :return:
+    """
+    global final_db
+    try:
+        db_len = len(final_db)
+        final_db.drop(final_db.index[final_db['userId'] == userId_removed], inplace=True)
+        
+        if len(final_db) == db_len:
+            return {'We dont have that user in our DB, try another one'}
+        else:
+            return {'userId as': int(userId_removed),
+                'The user has been removed from our DB ':' ',}
+    except:
+        return {'We dont have that user in our DB'}
+        
+@app.get("/delete_movie/{movieId_removed}")
+async def delete_movie(movieId_removed:int):
+    """
+    In this endpoint we can check if a userId exists in the DB to remove it
+    :param userId_check:
+    :return:
+    """
+    global final_db
+    try:
+        db_len = len(final_db)
+        title_check = final_db.loc[final_db['movieId'] == movieId_removed, 'title'].iloc[0]
+        final_db.drop(final_db.index[final_db['movieId'] == movieId_removed], inplace=True)
+        if len(final_db) == db_len:
+            return {'We dont have that movie in our DB, try another one'}
+        else:
+            return {'movieId as': int(movieId_removed),
+                'The movie with the following title has been removed from our DB -> ':title_check,}
+    except:
+        return {'We dont have that movie in our DB'}
+   
 
 
     
