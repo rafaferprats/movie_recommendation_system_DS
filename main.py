@@ -32,7 +32,8 @@ app = FastAPI(
 #if you want to run the app to test the api use this line
 n_retrain = 0
 final_db = pd.read_csv("data/final_db.csv")
-retrain_path = 'API/retrain_models.py'
+retrain_path = 'addon/retrain_models.py'
+evaluation_dash_path = 'addon/evaluation_dash.py'
 # user input via API
 # df = pd.DataFrame(np.array([[userId, rating]]),
 #                   columns=['userId', 'rating'])
@@ -181,6 +182,8 @@ def add_user(movieId_new_row: int, rating_score_new_row: float):
             print('Retraining the model with the new user ... waiting retrain time')
             final_df.to_csv('data/refined_dataset.csv', sep=',', encoding='utf-8')
             os.system(f'python {retrain_path}')
+            print('Creating Evaluation dashboard with the new data ... ')
+            os.system(f'python {evaluation_dash_path}')
         else:
             print('next retrain when you add ', 5- n_retrain, ' rating more')
             n_retrain = n_retrain + 1
@@ -217,15 +220,17 @@ def user_add_rating(userId_new_row:int, movieId_new_row: int, rating_score_new_r
             print('Retraining the model with the new data ... waiting retrain time')
             final_df.to_csv('data/refined_dataset.csv', sep=',', encoding='utf-8')
             os.system(f'python {retrain_path}')
+            print('Creating Evaluation dashboard with the new data ... ')
+            os.system(f'python {evaluation_dash_path}')
         else:
             print('next retrain when you add ', 5- n_retrain, ' rating more')
             n_retrain = n_retrain + 1
-            return {'userId as': int(user_new_rating),
-                    'movieId': int(movieId_new_row),
-                    'movie title': str(title_str),
-                    'rating score': float(rating_score_new_row),
-                    'the movie has been rated': 'and added to our DB',}
-                
+        return {'userId as': int(user_new_rating),
+                'movieId': int(movieId_new_row),
+                'movie title': str(title_str),
+                'rating score': float(rating_score_new_row),
+                'the movie has been rated': 'and added to our DB',}
+            
     except:
         return {'We dont have that movie added or that user, please check other endpoint to check the userid or movieid'}
 

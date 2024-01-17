@@ -8,6 +8,7 @@ def test_home():
     assert response.status_code == 200
     assert response.json() == {"greetings": "welcome"}
     
+    
 def test_user_exist():
     response = client.get("/check_user_exist/10")
     assert response.status_code == 200
