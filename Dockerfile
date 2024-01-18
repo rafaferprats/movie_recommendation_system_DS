@@ -28,7 +28,7 @@ RUN pip installhttpx==0.26.0
 # Bundle app source
 COPY . .
 
-EXPOSE 5000
+EXPOSE $PORT
 
-CMD ["uvicorn", "main:app","--workers=4", "--host=0.0.0.0", "--port=5000"]
+CMD ["uvicorn", "main:app", "--workers=4", "--bind", "0.0.0.0:$PORT"]
 
