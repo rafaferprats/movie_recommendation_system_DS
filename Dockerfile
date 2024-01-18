@@ -17,7 +17,7 @@ COPY main.py /app/main.py
 # Install the Python dependencies
 RUN pip install pandas
 RUN pip install numpy
-RUN pip install scikit-learn==1.3.2
+RUN pip install scikit-learn==1.1.1
 RUN pip install fastapi==0.104.1
 RUN pip install uvicorn==0.24.0
 RUN pip install matplotlib==3.3.4
