@@ -30,5 +30,7 @@ COPY . .
 
 EXPOSE $PORT
 
-CMD ["uvicorn", "main:app", "--workers=4", "--bind", "0.0.0.0:$PORT"]
+CMD ["uvicorn", "main:app", "--host=0.0.0.0", "0.0.0.0:$PORT"]
+
+
 
