@@ -8,3 +8,9 @@ fastapi==0.104.1
 uvicorn==0.24.0.post1
 pytest==7.4.4
 httpx==0.26.0
+mysql-connector-python
+mysqlclient
+recommenders==1.1.1
+mxnet==1.9.1
+d2l
+
