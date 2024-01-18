@@ -20,6 +20,9 @@ RUN pip install numpy
 RUN pip install scikit-learn==1.3.2
 RUN pip install fastapi==0.104.1
 RUN pip install uvicorn==0.24.0
+RUN pip install matplotlib==3.3.4
+RUN pip install pytest==7.4.4
+RUN pip installhttpx==0.26.0
 
 
 # Bundle app source
@@ -27,5 +30,5 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=5000"]
+CMD ["uvicorn", "main:app","--workers=4", "--host=0.0.0.0", "--port=5000"]
 
