@@ -322,4 +322,4 @@ async def delete_movie(movieId_removed:int):
 
     
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0")
+    uvicorn.run(debug=True,use_reloader=False)
