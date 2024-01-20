@@ -13,14 +13,6 @@ app = FastAPI(
         {
             'name': 'home',
             'description': 'entry of the API'
-        },
-        {
-            'name': 'movie_recommendation_via_user',
-            'description': 'put the userId and get Top 5 recommended movies'
-        },
-        {
-            'name': 'movie_recomendation_via_movie',
-            'description': 'put the movieId and get Top 5 recommended movies'
         }
     ]
     )
