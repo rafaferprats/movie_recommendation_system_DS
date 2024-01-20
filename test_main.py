@@ -36,16 +36,15 @@ def test_movie_exist():
       "We dont have that movie in our DB"
     ]
 
-
-#######add user
-
-#user exists
-
-#user doesn´t exist yet, add
-
-
-
 ######add user rating
+def test_movie_rating():
+    # movie exits
+    response_1 = client.get("/check_movie_exist/128715")
+    assert response_1.status_code == 200
+    assert response_1.json() == {
+      "movieId as": 128715,
+      "We have that movie in our DB as": "Eloise at the Plaza (2003)"
+    }
 #add rating to existing user, existing movie
 
 #add rating to not existing user but to existing movie
