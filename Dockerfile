@@ -30,7 +30,7 @@ COPY . .
 
 EXPOSE $PORT
 
-CMD ["uvicorn", "main:app", "--port=$PORT"]
+CMD ["uvicorn", "main:app"]
 
 
 
