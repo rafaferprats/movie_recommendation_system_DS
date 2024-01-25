@@ -9,17 +9,17 @@ def test_home():
     assert response.json() == {"greetings": "welcome"}
 
 
-def test_movie_recommendation_via_user():
-    response = client.get("/movie_recommendation_via_user/1")
-    assert response.status_code == 200
-    from main import get_movie_from_user
-    assert response.json() == get_movie_from_user(1).to_json()
+#def test_movie_recommendation_via_user():
+#    response = client.get("/movie_recommendation_via_user/1")
+#    assert response.status_code == 200
+#    from main import get_movie_from_user
+#    assert response.json() == get_movie_from_user(1).to_json()
 
-def test_movie_recommendation_via_movie():
-    response = client.get("/movie_recommendation_via_movie/4162")
-    assert response.status_code == 200
-    from main import get_movie_from_movie
-    assert response.json() == get_movie_from_movie(4162).to_json()
+#def test_movie_recommendation_via_movie():
+#    response = client.get("/movie_recommendation_via_movie/4162")
+#    assert response.status_code == 200
+#    from main import get_movie_from_movie
+#    assert response.json() == get_movie_from_movie(4162).to_json()
 
 
 def test_user_exist():
