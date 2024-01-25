@@ -1,10 +1,11 @@
+import os
+
 import pandas as pd
 import numpy as np
 from fastapi import Depends, FastAPI, HTTPException, status, Form
-from fastapi.security import HTTPBasic, HTTPBasicCredentials, OAuth2PasswordBearer,OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
 import uvicorn
 from pydantic import BaseModel
-import sqlite3
 from typing_extensions import Annotated
 import datetime
 import json
@@ -26,11 +27,13 @@ connection = mysql.connector.connect(host='localhost',
 
 
 # read data from DB
-ratings_data = pd.read_sql_query("SELECT * FROM ratings", engine)
-movies_data = pd.read_sql_query("SELECT * FROM movies", engine)
-predictions = pd.read_sql_query("SELECT * FROM predictions", engine)
-new_ratings = pd.read_sql_query("SELECT * FROM new_user_rating", engine)
-registered_user = pd.read_sql_query("SELECT * FROM users_db", engine)
+def read_fresh_data():
+    ratings_data = pd.read_sql_query("SELECT * FROM ratings", engine)
+    movies_data = pd.read_sql_query("SELECT * FROM movies", engine)
+    predictions = pd.read_sql_query("SELECT * FROM predictions", engine)
+    new_ratings = pd.read_sql_query("SELECT * FROM new_user_rating", engine)
+    registered_user = pd.read_sql_query("SELECT * FROM users_db", engine)
+    return ratings_data, movies_data, predictions, new_ratings, registered_user
 
 class User(BaseModel):
     username: str
@@ -44,6 +47,7 @@ app = FastAPI(
     description="API build up by Fernandez, Guillherme and Claudia powered by FastAPI.",
     version="1.0.1"
 )
+
 
 @app.get('/', tags=["home"])
 def get_index():
@@ -59,6 +63,17 @@ def get_movie_reco(token: str = Depends(oauth2_scheme)):
     :param input_user:
     :return:
     """
+    ratings_data, movies_data, predictions, new_ratings, registered_user = read_fresh_data()
+    if len(ratings_data)% 5==0:
+        # Get the current script's directory
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # Get the parent directory by going one level up
+        parent_dir = os.path.dirname(current_dir)
+        # Add the parent directory to sys.path
+        import sys
+        sys.path.append(parent_dir)
+        from models.models.svd import retrain_model
+        retrain_model()
     # generate recommendation using the model that we have trained
     user_prediction = predictions[predictions.userId == int(token[0])]
     user_prediction = user_prediction.sort_values(by="prediction",ascending=False)
@@ -72,7 +87,6 @@ def get_movie_reco(token: str = Depends(oauth2_scheme)):
 
 ### user registration process  #####
 def get_user(username: str):
-    connection = sqlite3.connect("../data/movie.db")
     cursor = connection.cursor()
     cursor.execute("SELECT username FROM users_db")
     rows = cursor.fetchall()
@@ -98,7 +112,6 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    connection = sqlite3.connect("../data/movie.db")
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM users_db")
     rows = cursor.fetchall()
@@ -107,8 +120,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     print(user_name)
     if not user_name:
         raise HTTPException(status_code=400, detail="Incorrect username ")
-    connection2 = sqlite3.connect("../data/movie.db")
-    cursor2 = connection2.cursor()
+    cursor2 = connection.cursor()
     cursor2.execute(f"SELECT * FROM users_db")
     rows = cursor2.fetchall()
     passw_list= [row for row in rows]
@@ -120,7 +132,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @app.get("/users/", name='get all user')
 def all_user(token: str = Depends(oauth2_scheme)):
-    connection = sqlite3.connect("../data/movie.db")
     cursor = connection.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS users_db(username, password)")
 
@@ -131,7 +142,7 @@ def all_user(token: str = Depends(oauth2_scheme)):
 
 @app.put("/users/", name='register new user')
 def set_new_user(user: User, token: str = Depends(oauth2_scheme)):
-    print(token)
+    ratings_data, movies_data, predictions, new_ratings, registered_user = read_fresh_data()
     if token=="admin":
         cursor = connection.cursor()
         if len(registered_user[registered_user["username"]==str(token[0])])==0:
@@ -150,7 +161,7 @@ def set_ratings_to_recommended_movies(rating_1: Annotated[str, Form()],
                                       rating_4: Annotated[str, Form()],
                                       rating_5: Annotated[str, Form()],
                                       token: str = Depends(oauth2_scheme)):
-
+    ratings_data, movies_data, predictions, new_ratings, registered_user = read_fresh_data()
     user_prediction = predictions[predictions.userId == int(token[0])]
     user_prediction = user_prediction.sort_values(by="prediction", ascending=False)
     choice = user_prediction[:5]
@@ -159,6 +170,7 @@ def set_ratings_to_recommended_movies(rating_1: Annotated[str, Form()],
     print("new_ratings", new_ratings)
     df = pd.merge(choice[["userId", "movieId"]], new_ratings[["userId", "movieId", "title"]], on=["userId", "movieId"],
                   how='left', indicator='Exist')
+    print("Exist", df)
     df['Exist'] = np.where(df.Exist == 'both', True, False)
     for i in range(0, len(df)):
         if df.iloc[i]["Exist"] == True:
@@ -197,7 +209,3 @@ def set_ratings_to_recommended_movies(rating_1: Annotated[str, Form()],
                 f"{prediction_movie_title[3]}": rating_4,
                 f"{prediction_movie_title[4]}": rating_5}
 
-
-if __name__ == "__main__":
-    # Run the FastAPI application on an Uvicorn server
-    uvicorn.run(app,host="0.0.0.0")
