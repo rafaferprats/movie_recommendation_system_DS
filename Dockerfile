@@ -22,7 +22,7 @@ RUN pip install fastapi==0.104.1
 RUN pip install uvicorn==0.24.0
 RUN pip install matplotlib
 RUN pip install pytest==7.4.4
-RUN pip installhttpx==0.26.0
+RUN pip install httpx==0.26.0
 
 
 # Bundle app source
