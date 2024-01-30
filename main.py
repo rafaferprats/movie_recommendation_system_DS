@@ -5,6 +5,12 @@ from collections import Counter
 import uvicorn
 import os
 
+from fastapi import Depends, FastAPI, HTTPException, status, Form
+from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
+from typing_extensions import Annotated
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 app = FastAPI(
     title="Movie Recommender API",
     description="API build up by Fernandez, Guillherme and Claudia powered by FastAPI.",
@@ -26,6 +32,7 @@ n_retrain = 0
 final_db = pd.read_csv("data/final_db.csv")
 retrain_path = 'addon/retrain_models.py'
 evaluation_dash_path = 'addon/evaluation_dash.py'
+user_db = pd.read_csv("data/user_db.csv")
 # user input via API
 # df = pd.DataFrame(np.array([[userId, rating]]),
 #                   columns=['userId', 'rating'])
@@ -40,17 +47,29 @@ def get_index():
     """Returns greetings
     """
     return {'greetings': 'welcome'}
+
+@app.post("/token")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    user_name = int(user_db[user_db["userId"] == int(form_data.username)]["userId"].values)
+    if not user_name == int(form_data.username):
+        raise HTTPException(status_code=400, detail="Incorrect username ")
+    passw = user_db[user_db["userId"] == int(form_data.username)]["password"].values
+    if not passw== form_data.password:
+        raise HTTPException(status_code=400, detail="Incorrect password")
+
+    return {"access_token": user_name, "token_type": "bearer"}
+
     
-@app.get("/movie_recommendation_via_user/{input_user}", tags=["movie_recommendation_via_userId"])
-def get_movie_from_user(input_user: int):
+@app.get("/movie_recommendation_via_user", tags=["movie_recommendation_via_userId"]) #/{input_user}
+def get_movie_from_user(token: str = Depends(oauth2_scheme)): #input_user: int,
     """
     In this endpoint the user will put the userId into the API and will return 5 movies
     which are most likely similiar rated by users therefore in the same cluster
     :param input_user:
     :return:
     """
-    input_user = int(input_user)
-    cluster_users = final_db.loc[final_db['userId'] == input_user, 'loc_clusters_users']
+    # input_user = int(input_user)
+    cluster_users = final_db.loc[final_db['userId'] == int(token[0]), 'loc_clusters_users']
     cluster_users = Counter(cluster_users).most_common(1)[0] # 4, 6 times
     
     users = final_db.loc[final_db['loc_clusters_users'] == cluster_users[0], 'userId']
@@ -77,7 +96,7 @@ def get_movie_from_user(input_user: int):
     
     
 @app.get("/movie_recomendation_via_movie/{input_movie}")
-def get_movie_from_movie(input_movie: int):
+def get_movie_from_movie(input_movie: int, token: str = Depends(oauth2_scheme)):
     """
     In this endpoint the user will put the movieId into the API and will return 5 movies
     which are similiar rated and therefore in the same cluster
@@ -112,7 +131,7 @@ def get_movie_from_movie(input_movie: int):
     return movie_reco_list['list_movies_title']
     
 @app.get("/check_user_exist/{userId_check}")
-def check_user_exist(userId_check: int):
+def check_user_exist(token: str = Depends(oauth2_scheme)): #userId_check: int,
     """
     In this endpoint we can check if a userId exists in the DB
     :param userId_check:
@@ -120,14 +139,14 @@ def check_user_exist(userId_check: int):
     """
     global final_db
     try:
-        check_user = final_db.loc[final_db['userId'] == userId_check, 'userId'].iloc[0]
+        check_user = final_db.loc[final_db['userId'] == int(token[0]), 'userId'].iloc[0]
         return {'userId as': int(check_user),
                 'We have that user in our DB':'',}
     except:
         return {'We dont have that user in our DB'}
         
 @app.get("/check_movie_exist/{movieId_check}")
-def check_movie_exist(movieId_check: int):
+def check_movie_exist(movieId_check: int, token: str = Depends(oauth2_scheme)):
     """
     In this endpoint we can check if a movieId exists in the DB
     :param movieId_check:
@@ -143,7 +162,7 @@ def check_movie_exist(movieId_check: int):
         return {'We dont have that movie in our DB'}
     
 @app.get("/add_user/movieid/{movieId_new_row}/rating/{rating_score_new_row}")
-def add_user(movieId_new_row: int, rating_score_new_row: float):
+def add_user(movieId_new_row: int, rating_score_new_row: float, token: str = Depends(oauth2_scheme)):
     """
     In this endpoint we can add a new user, moviedId, and a rate of the movie in the DB
     :param movieId_new_row, rating_score_new_row:
@@ -151,7 +170,7 @@ def add_user(movieId_new_row: int, rating_score_new_row: float):
     """
     global final_db, n_retrain
     new_user_id =  int(final_db['userId'].max() + 1)
-    
+
     try:
         title_new_rating = final_db.loc[final_db['movieId'] == movieId_new_row, 'title']
         #print(title_new_rating.iloc[0])
@@ -159,11 +178,11 @@ def add_user(movieId_new_row: int, rating_score_new_row: float):
         #print(movieId_new_row)
         #print(final_db.info())
         title_str = title_new_rating.iloc[0]
-        
+
         new_row = {'userId': new_user_id, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': movieId_new_row, 'loc_clusters_movies': movieId_new_row}
         #print(new_row)
         #final_db = final_db.append(new_row, ignore_index=True)
-        
+
         new_row = pd.DataFrame({'userId': new_user_id, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': movieId_new_row, 'loc_clusters_movies': movieId_new_row}, index=[0])
         final_db = pd.concat([new_row,final_db.loc[:]])
         if n_retrain == 5:
@@ -179,8 +198,8 @@ def add_user(movieId_new_row: int, rating_score_new_row: float):
         else:
             print('next retrain when you add ', 5- n_retrain, ' rating more')
             n_retrain = n_retrain + 1
-            
-        
+
+
         return {'new userId as': int(new_user_id),
                 'movieId': int(movieId_new_row),
                 'movie title': str(title_str),
@@ -188,10 +207,9 @@ def add_user(movieId_new_row: int, rating_score_new_row: float):
                 'the user has been': 'added to our DB',}
     except:
         return {'We dont have that movie in our DB'}
-
     
 @app.get("/userid/{userId_new_row}/movieid/{movieId_new_row}/rating/{rating_score_new_row}")
-def user_add_rating(userId_new_row:int, movieId_new_row: int, rating_score_new_row: float):
+def user_add_rating( movieId_new_row: int, rating_score_new_row: float, token: str = Depends(oauth2_scheme)): #userId_new_row:int,
     """
     In this endpoint a specific user can add a moviedId and a rate of the movie in the DB
     :param userId_new_row, movieId_new_row, rating_score_new_row:
@@ -199,7 +217,8 @@ def user_add_rating(userId_new_row:int, movieId_new_row: int, rating_score_new_r
     """
     global final_db, n_retrain
     try:
-        user_new_rating = final_db.loc[final_db['userId'] == userId_new_row, 'userId'].iloc[0]
+        # user_new_rating = final_db.loc[final_db['userId'] == userId_new_row, 'userId'].iloc[0]
+        user_new_rating = final_db.loc[final_db['userId'] == int(token[0]), 'userId'].iloc[0]
         title_new_rating = final_db.loc[final_db['movieId'] == movieId_new_row, 'title']
         title_str = title_new_rating.iloc[0]
         new_row = pd.DataFrame({'userId': user_new_rating, 'title': title_str, 'movieId': movieId_new_row, 'rating': rating_score_new_row, 'loc_clusters_users': user_new_rating, 'loc_clusters_movies': user_new_rating}, index=[0])
@@ -227,7 +246,7 @@ def user_add_rating(userId_new_row:int, movieId_new_row: int, rating_score_new_r
         return {'We dont have that movie added or that user, please check other endpoint to check the userid or movieid'}
 
 @app.get("/show_db_data/")
-def show_db_data():    
+def show_db_data(token: str = Depends(oauth2_scheme)):
     """
     In this endpoint a we can check the numbers of users, movies and ratings
     :param:
@@ -253,7 +272,7 @@ def show_db_data():
             'rating of the movies with 5': int(rating_count_df['count'].iloc[9]),}
     
 @app.get("/show_scores/")
-def show_scores_data():    
+def show_scores_data(token: str = Depends(oauth2_scheme)):
     """
     In this endpoint a we can check the numbers of users, movies and ratings
     :param:
@@ -271,7 +290,7 @@ def show_scores_data():
           
 
 @app.get("/delete_user/{userId_removed}")
-async def delete_user(userId_removed:int):
+async def delete_user(userId_removed:int, token: str = Depends(oauth2_scheme)):
     """
     In this endpoint we can check if a userId exists in the DB to remove it
     :param userId_check:
@@ -291,7 +310,7 @@ async def delete_user(userId_removed:int):
         return {'We dont have that user in our DB'}
         
 @app.get("/delete_movie/{movieId_removed}")
-async def delete_movie(movieId_removed:int):
+async def delete_movie(movieId_removed:int, token: str = Depends(oauth2_scheme)):
     """
     In this endpoint we can check if a userId exists in the DB to remove it
     :param userId_check:
