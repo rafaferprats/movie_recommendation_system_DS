@@ -31,7 +31,7 @@ COPY . .
 EXPOSE $PORT
 
 ENTRYPOINT ["uvicorn"]
-CMD [ "main:app",  "--host", "0.0.0.0"]
+CMD [ "main:app", "--port", "$PORT" , "--host", "0.0.0.0"] 
 
 
 
