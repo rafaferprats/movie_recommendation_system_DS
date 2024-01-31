@@ -29,6 +29,7 @@ RUN pip install httpx==0.26.0
 COPY . .
 
 EXPOSE $PORT
+
 ENTRYPOINT ["uvicorn"]
 CMD [ "main:app",  "--host", "0.0.0.0"]
 
