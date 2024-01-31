@@ -28,7 +28,7 @@ RUN pip install httpx==0.26.0
 # Bundle app source
 COPY . .
 
-EXPOSE 7000
+EXPOSE 8000
 ENTRYPOINT ["uvicorn"]
 CMD [ "main:app",  "--host", "0.0.0.0"]
 
