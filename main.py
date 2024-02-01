@@ -135,15 +135,12 @@ def get_movie_from_movie(input_movie: int, token: str = Depends(oauth2_scheme)):
 @app.put("/users/", name='register new user')
 def set_new_user(user: User, token: str = Depends(oauth2_scheme)):
     user_data = pd.read_csv("data/user_db.csv")
-    if token == "999999":
-        if (len(user_data[user_data["userId"]==user.username])) ==0:
-            new_row = pd.DataFrame({'userId': user.username, 'password': user.password}, index=[0])
-            user_data = pd.concat([new_row,user_data.loc[:]])
-            user_data.to_csv('data/user_db.csv', sep=',', encoding='utf-8', index=False)
-        else:
-            raise HTTPException(status_code=400, detail="user already exists")
-    if token != "999999":
-            raise HTTPException(status_code=400, detail="not sufficient rights")
+    if (len(user_data[user_data["userId"]==user.username])) ==0:
+        new_row = pd.DataFrame({'userId': user.username, 'password': user.password}, index=[0])
+        user_data = pd.concat([new_row,user_data.loc[:]])
+        user_data.to_csv('data/user_db.csv', sep=',', encoding='utf-8', index=False)
+    else:
+        raise HTTPException(status_code=400, detail="user already exists")
 
 @app.get("/check_user_exist/{userId_check}")
 def check_user_exist(token: str = Depends(oauth2_scheme)): #userId_check: int,
@@ -312,17 +309,20 @@ async def delete_user(userId_removed:int, token: str = Depends(oauth2_scheme)):
     :return:
     """
     global final_db
-    try:
-        db_len = len(final_db)
-        final_db.drop(final_db.index[final_db['userId'] == userId_removed], inplace=True)
-        
-        if len(final_db) == db_len:
-            return {'We dont have that user in our DB, try another one'}
-        else:
-            return {'userId as': int(userId_removed),
-                'The user has been removed from our DB ':' ',}
-    except:
-        return {'We dont have that user in our DB'}
+    if token == "999999":
+        try:
+            db_len = len(final_db)
+            final_db.drop(final_db.index[final_db['userId'] == userId_removed], inplace=True)
+
+            if len(final_db) == db_len:
+                return {'We dont have that user in our DB, try another one'}
+            else:
+                return {'userId as': int(userId_removed),
+                    'The user has been removed from our DB ':' ',}
+        except:
+            return {'We dont have that user in our DB'}
+    if token != "999999":
+            raise HTTPException(status_code=400, detail="not sufficient rights")
         
 @app.get("/delete_movie/{movieId_removed}")
 async def delete_movie(movieId_removed:int, token: str = Depends(oauth2_scheme)):
@@ -332,17 +332,20 @@ async def delete_movie(movieId_removed:int, token: str = Depends(oauth2_scheme))
     :return:
     """
     global final_db
-    try:
-        db_len = len(final_db)
-        title_check = final_db.loc[final_db['movieId'] == movieId_removed, 'title'].iloc[0]
-        final_db.drop(final_db.index[final_db['movieId'] == movieId_removed], inplace=True)
-        if len(final_db) == db_len:
-            return {'We dont have that movie in our DB, try another one'}
-        else:
-            return {'movieId as': int(movieId_removed),
-                'The movie with the following title has been removed from our DB -> ':title_check,}
-    except:
-        return {'We dont have that movie in our DB'}
+    if token == "999999":
+        try:
+            db_len = len(final_db)
+            title_check = final_db.loc[final_db['movieId'] == movieId_removed, 'title'].iloc[0]
+            final_db.drop(final_db.index[final_db['movieId'] == movieId_removed], inplace=True)
+            if len(final_db) == db_len:
+                return {'We dont have that movie in our DB, try another one'}
+            else:
+                return {'movieId as': int(movieId_removed),
+                    'The movie with the following title has been removed from our DB -> ':title_check,}
+        except:
+            return {'We dont have that movie in our DB'}
+    if token != "999999":
+            raise HTTPException(status_code=400, detail="not sufficient rights")
    
 
 

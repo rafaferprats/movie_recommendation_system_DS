@@ -47,7 +47,7 @@ def test_check_user_exists(client, test_user):
 
 def test_check_movie_exists(client, test_user):
     token = test_login(client, test_user)
-    response = client.get("http://127.0.0.1:8000/check_movie_exist/128715", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/check_movie_exist/128715", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
 
 def test_check_movie_doesnt_exists(client, test_user):
@@ -57,31 +57,31 @@ def test_check_movie_doesnt_exists(client, test_user):
 
 def test_check_movie_rating(client, test_user):
     token = test_login(client, test_user)
-    response = client.get("http://127.0.0.1:8000/add_user/movieid/12/rating/5", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/add_user/movieid/12/rating/5", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
 
 def test_show_db_data(client, test_user):
     token = test_login(client, test_user)
-    response = client.get("http://127.0.0.1:8000/add_user/movieid/12/rating/5", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/add_user/movieid/12/rating/5", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
 
 def test_show_score(client, test_user):
     token = test_login(client, test_user)
-    response = client.get("http://127.0.0.1:8000/show_scores/", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/show_scores/", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
 
 def test_delete_user(client, test_user):
     token = test_login(client, test_user)
-    response = client.get("http://127.0.0.1:8000/delete_user/10032", headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 200
+    response = client.get("/delete_user/10032", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 400
 
 def test_delete_movie(client, test_user):
     token = test_login(client, test_user)
-    response = client.get("http://127.0.0.1:8000/delete_movie/2478", headers={"Authorization": f"Bearer {token}"})
-    assert response.status_code == 200
+    response = client.get("/delete_movie/2478", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 400
 
 
 def test_user_exist(client, test_user):
     token = test_login(client, test_user)
-    response = client.get("http://127.0.0.1:8000/check_user_exist/2", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/check_user_exist/2", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
