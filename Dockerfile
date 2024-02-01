@@ -23,6 +23,7 @@ RUN pip install uvicorn==0.24.0
 RUN pip install matplotlib
 RUN pip install pytest==7.4.4
 RUN pip install httpx==0.26.0
+RUN pip install python-multipart==0.0.6
 
 
 # Bundle app source
