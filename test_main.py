@@ -52,7 +52,7 @@ def test_check_movie_exists(client, test_user):
 
 def test_check_movie_doesnt_exists(client, test_user):
     token = test_login(client, test_user)
-    response = client.get("http://127.0.0.1:8000/check_movie_exist/128716", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/check_movie_exist/128716", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
 
 def test_check_movie_rating(client, test_user):
