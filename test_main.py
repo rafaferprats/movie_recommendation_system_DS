@@ -6,10 +6,6 @@ import warnings
 warnings.filterwarnings('ignore')
 import requests
 
-
-n_retrain = 0
-final_db = pd.read_csv("data/final_db.csv")
-
 @pytest.fixture(scope="module")
 def client():
     with TestClient(app) as c:
