@@ -34,16 +34,16 @@ def test_movie_recommendation_via_user(client, test_user):
     assert response.status_code == 200
     from main import get_movie_from_user
     assert isinstance(response.json(), dict)
-#
-# def test_movie_reco(client, test_user):
-#     token = test_login(client, test_user)
-#     response = requests.get("localhost:8000/movie_recomendation_via_movie/4162", headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 200
-#
-# def test_check_user_exists(client, test_user):
-#     token = test_login(client, test_user)
-#     response =  requests.get("http://127.0.0.1:8000/check_user_exist/2", headers={"Authorization": f"Bearer {token}"})
-#     assert response.status_code == 200
+
+def test_movie_reco(client, test_user):
+    token = test_login(client, test_user)
+    response = client.get("/movie_recomendation_via_movie/4162", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
+
+def test_check_user_exists(client, test_user):
+    token = test_login(client, test_user)
+    response =  client.get("/check_user_exist/2", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
 #
 # def test_check_movie_exists(client, test_user):
 #     token = test_login(client, test_user)
