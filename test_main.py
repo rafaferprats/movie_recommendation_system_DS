@@ -2,14 +2,13 @@ from fastapi.testclient import TestClient
 import pandas as pd
 from main import app
 import pytest
-from fastapi.security import OAuth2PasswordBearer
 import warnings
 warnings.filterwarnings('ignore')
 
 
 n_retrain = 0
 final_db = pd.read_csv("data/final_db.csv")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
 @pytest.fixture(scope="module")
 def client():
     with TestClient(app) as c:
@@ -62,7 +61,6 @@ def test_check_movie_doesnt_exists(client, test_user):
     token = test_login(client, test_user)
     response = requests.get("http://127.0.0.1:8000/check_movie_exist/128716", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
-
 
 def test_check_movie_rating(client, test_user):
     token = test_login(client, test_user)
