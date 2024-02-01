@@ -1,6 +1,5 @@
 import pandas as pd
 from collections import Counter
-import uvicorn
 import os
 
 from fastapi import Depends, FastAPI, HTTPException
