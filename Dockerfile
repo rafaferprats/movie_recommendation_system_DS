@@ -31,6 +31,7 @@ COPY . .
 
 EXPOSE $PORT
 
+CMD ["uvicorn", "main:app"]
 
 
 
