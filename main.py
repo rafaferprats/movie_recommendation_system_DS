@@ -1,13 +1,15 @@
 import pandas as pd
-import pickle
-from fastapi import FastAPI
 from collections import Counter
 import uvicorn
 import os
 
-from fastapi import Depends, FastAPI, HTTPException, status, Form
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
-from typing_extensions import Annotated
+from pydantic import BaseModel
+
+class User(BaseModel):
+    username: str
+    password: str
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -32,7 +34,7 @@ n_retrain = 0
 final_db = pd.read_csv("data/final_db.csv")
 retrain_path = 'addon/retrain_models.py'
 evaluation_dash_path = 'addon/evaluation_dash.py'
-user_db = pd.read_csv("data/user_db.csv")
+user_data = pd.read_csv("data/user_db.csv")
 # user input via API
 # df = pd.DataFrame(np.array([[userId, rating]]),
 #                   columns=['userId', 'rating'])
@@ -50,11 +52,12 @@ def get_index():
 
 @app.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    user_name = int(user_db[user_db["userId"] == int(form_data.username)]["userId"].values)
+    user_name = int(user_data[user_data["userId"] == int(form_data.username)]["userId"].values)
+    print(user_name)
     if not user_name == int(form_data.username):
         raise HTTPException(status_code=400, detail="Incorrect username ")
-    passw = user_db[user_db["userId"] == int(form_data.username)]["password"].values
-    if not passw== form_data.password:
+    passw = user_data[user_data["userId"] == int(form_data.username)]["password"].values[0]
+    if not passw == form_data.password:
         raise HTTPException(status_code=400, detail="Incorrect password")
 
     return {"access_token": user_name, "token_type": "bearer"}
@@ -129,7 +132,20 @@ def get_movie_from_movie(input_movie: int, token: str = Depends(oauth2_scheme)):
     movie_reco_df = pd.DataFrame(list(zip(list_movies_title, list_movie_id)), columns=['list_movies_title', 'list_movie_id']) 
     movie_reco_list = movie_reco_df.sample(n=5) 
     return movie_reco_list['list_movies_title']
-    
+
+@app.put("/users/", name='register new user')
+def set_new_user(user: User, token: str = Depends(oauth2_scheme)):
+    user_data = pd.read_csv("data/user_db.csv")
+    if token == "999999":
+        if (len(user_data[user_data["userId"]==user.username])) ==0:
+            new_row = pd.DataFrame({'userId': user.username, 'password': user.password}, index=[0])
+            user_data = pd.concat([new_row,user_data.loc[:]])
+            user_data.to_csv('data/user_db.csv', sep=',', encoding='utf-8', index=False)
+        else:
+            raise HTTPException(status_code=400, detail="user already exists")
+    if token != "999999":
+            raise HTTPException(status_code=400, detail="not sufficient rights")
+
 @app.get("/check_user_exist/{userId_check}")
 def check_user_exist(token: str = Depends(oauth2_scheme)): #userId_check: int,
     """
