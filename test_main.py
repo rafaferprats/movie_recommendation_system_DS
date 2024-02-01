@@ -5,6 +5,7 @@ import pytest
 from fastapi.security import OAuth2PasswordBearer
 import warnings
 warnings.filterwarnings('ignore')
+import requests
 
 
 n_retrain = 0
@@ -38,10 +39,6 @@ def test_movie_recommendation_via_user(client, test_user):
     assert response.status_code == 200
     from main import get_movie_from_user
     assert isinstance(response.json(), dict)
-
-
-# Import the requests library
-import requests
 
 def test_movie_reco(client, test_user):
     token = test_login(client, test_user)
