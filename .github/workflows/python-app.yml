@@ -67,6 +67,8 @@ jobs:
         # (Optional, default: "")
         # Additional options of docker build command.
         docker_options: "--no-cache"
+        dockerfile_path: '.' # set the path to the folder where the Dockerfile is located
+        process_type: 'web' # Specify the process type you want to build and release
   
         # (Optional, default: "web")
         # Select the process type for which you want the docker container to be uploaded.
