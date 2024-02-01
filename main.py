@@ -1,6 +1,7 @@
 import pandas as pd
 from collections import Counter
 import os
+import uvicorn
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
@@ -348,5 +349,6 @@ async def delete_movie(movieId_removed:int, token: str = Depends(oauth2_scheme))
             raise HTTPException(status_code=400, detail="not sufficient rights")
    
 
-
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=5000)
     

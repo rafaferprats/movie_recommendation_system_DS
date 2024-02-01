@@ -29,7 +29,7 @@ RUN pip install python-multipart==0.0.6
 # Bundle app source
 COPY . .
 
-EXPOSE $PORT
+EXPOSE 5000
 
 CMD ["uvicorn", "main:app"]
 
