@@ -349,6 +349,6 @@ async def delete_movie(movieId_removed:int, token: str = Depends(oauth2_scheme))
             raise HTTPException(status_code=400, detail="not sufficient rights")
    
 
-#if __name__ == "__main__":
-#    uvicorn.run(app, host="0.0.0.0", port="$PORT")
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port="$PORT")
     
