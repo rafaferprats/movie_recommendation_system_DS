@@ -29,9 +29,9 @@ RUN pip install python-multipart==0.0.6
 # Bundle app source
 COPY . .
 
-EXPOSE 5000
+EXPOSE $PORT
 
-CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=5000"]
+CMD ["uvicorn", "main:app", "--host=0.0.0.0", "--port=$PORT"]
 
 
 
