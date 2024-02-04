@@ -2,6 +2,8 @@ import pandas as pd
 from collections import Counter
 import os
 import uvicorn
+from fastapi.middleware.wsgi import WSGIMiddleware
+from dashb1 import app as dashboard1
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
@@ -24,6 +26,8 @@ app = FastAPI(
         }
     ]
     )
+
+app.mount("/dashboard1", WSGIMiddleware(dashboard1.server))
     
     
 #if you want to run the app with docker use this line
