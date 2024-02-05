@@ -17,7 +17,7 @@ app = dash.Dash(__name__,
 
 # App layout
 app.layout = html.Div([
-    html.Div(children='Evaluation Dashboard, Time, Nº cluster and Scores'),
+    html.Div(children='Evaluation Dashboard, Time, Nº cluster and Scores - Dev'),
     html.Hr(),
     dcc.RadioItems(options=['retraining_time_seconds','num_users','db_score_reco_user_15','db_score_reco_user_25','db_score_reco_user_35','db_score_reco_user_45','db_score_reco_movie_15','db_score_reco_movie_25','db_score_reco_movie_35','db_score_reco_movie_45','ch_score_reco_user_15','ch_score_reco_user_25','ch_score_reco_user_35','ch_score_reco_user_45','ch_score_reco_movie_15','ch_score_reco_movie_25','ch_score_reco_movie_35','ch_score_reco_movie_45'], value='retraining_time_seconds', id='controls-and-radio-item'),
     dash_table.DataTable(data=df.to_dict('records'), page_size=6),
