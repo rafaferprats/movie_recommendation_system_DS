@@ -12,8 +12,7 @@ Members
 --------------------------------
 |         Name             
 |--------------------------
-|Rafael Fernandez        
-|Guilherme Santos       
+|Rafael Fernandez            
 |Claudia Clörs          
 
 About DataSet
